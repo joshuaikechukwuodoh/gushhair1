@@ -10,7 +10,17 @@ import { serveStatic } from "hono/bun";
 const app = new Hono();
 
 // Middleware
-app.use("*", cors());
+app.use(
+  "*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
+    credentials: true,
+  })
+);
 
 // tRPC
 app.use(
@@ -24,6 +34,10 @@ app.use(
 // UploadThing route
 const handlers = createRouteHandler({ router: uploadRouter });
 app.all("/api/uploadthing", (c) => handlers(c.req.raw));
+
+// Serve admin static files
+app.use("/admin/*", serveStatic({ root: "../admin/dist" }));
+app.get("/admin/*", serveStatic({ path: "../admin/dist/index.html" }));
 
 // Serve frontend static files
 app.use("/*", serveStatic({ root: "../frontend/dist" }));
