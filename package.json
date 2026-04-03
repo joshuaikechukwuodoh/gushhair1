@@ -9,8 +9,8 @@
     "dev:admin": "cd admin && npm run dev -- --port 5174",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:admin\"",
     "build": "npm run build:frontend && npm run build:admin && npm run build:move",
-    "build:frontend": "cd frontend && npm run build",
-    "build:admin": "cd admin && npm run build",
+    "build:frontend": "cd frontend && npm install && npm run build",
+    "build:admin": "cd admin && npm install && npm run build",
     "build:move": "mkdir -p dist/admin && cp -r frontend/dist/* dist/ && cp -r admin/dist/* dist/admin/",
     "start": "cd backend && bun run src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
