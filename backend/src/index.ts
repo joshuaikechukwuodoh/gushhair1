@@ -5,9 +5,8 @@ import { createContext } from "./context";
 import { cors } from "hono/cors";
 import { createRouteHandler } from "uploadthing/server";
 import { uploadRouter } from "./lib/uploadthing";
-import { serveStatic } from "hono/bun";
 
-const app = new Hono();
+export const app = new Hono();
 
 // Middleware
 app.use(
@@ -35,13 +34,18 @@ app.use(
 const handlers = createRouteHandler({ router: uploadRouter });
 app.all("/api/uploadthing", (c) => handlers(c.req.raw));
 
-// Serve admin static files
-app.use("/admin/*", serveStatic({ root: "../admin/dist" }));
-app.get("/admin/*", serveStatic({ path: "../admin/dist/index.html" }));
+// Serve static files (only in Bun environment)
+if (typeof Bun !== "undefined") {
+  const { serveStatic } = await import("hono/bun");
+  
+  // Serve admin static files
+  app.use("/admin/*", serveStatic({ root: "../admin/dist" }));
+  app.get("/admin/*", serveStatic({ path: "../admin/dist/index.html" }));
 
-// Serve frontend static files
-app.use("/*", serveStatic({ root: "../frontend/dist" }));
-app.get("/*", serveStatic({ path: "../frontend/dist/index.html" }));
+  // Serve frontend static files
+  app.use("/*", serveStatic({ root: "../frontend/dist" }));
+  app.get("/*", serveStatic({ path: "../frontend/dist/index.html" }));
+}
 
 app.get("/api/health", (c) => {
   return c.text("Backend is running!");

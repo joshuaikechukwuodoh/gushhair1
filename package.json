@@ -8,9 +8,10 @@
     "dev:frontend": "cd frontend && npm run dev",
     "dev:admin": "cd admin && npm run dev -- --port 5174",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run dev:admin\"",
-    "build": "npm run build:frontend && npm run build:admin",
+    "build": "npm run build:frontend && npm run build:admin && npm run build:move",
     "build:frontend": "cd frontend && npm run build",
     "build:admin": "cd admin && npm run build",
+    "build:move": "mkdir -p dist/admin && cp -r frontend/dist/* dist/ && cp -r admin/dist/* dist/admin/",
     "start": "cd backend && bun run src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +20,16 @@
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "@hono/trpc-server": "^0.4.2",
+    "@trpc/server": "^11.16.0",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.9",
+    "jose": "^6.2.2",
+    "pg": "^8.20.0",
+    "uploadthing": "^7.7.4",
+    "zod": "^4.3.6"
   }
 }
