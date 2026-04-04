@@ -11,7 +11,7 @@
     "build": "npm run build:frontend && npm run build:admin && npm run build:move",
     "build:frontend": "npm run build -w frontend",
     "build:admin": "npm run build -w admin",
-    "build:move": "mkdir -p dist/admin && cp -rv frontend/dist/* dist/ && cp -rv admin/dist/* dist/admin/",
+    "build:move": "node -e \"const fs=require('fs');const path=require('path');fs.mkdirSync('dist/admin',{recursive:true});fs.cpSync('frontend/dist','dist',{recursive:true});fs.cpSync('admin/dist','dist/admin',{recursive:true});\"",
     "start": "cd backend && bun run src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

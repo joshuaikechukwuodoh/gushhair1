@@ -47,6 +47,15 @@ export const adminRouter = router({
   register: publicProcedure
     .input(z.object({ email: z.string(), password: z.string() }))
     .mutation(async ({ input }) => {
+      // Check if any admin already exists
+      const existingAdmins = await db.select().from(admins).limit(1);
+      if (existingAdmins.length > 0) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "An admin account already exists. Only one admin is allowed.",
+        });
+      }
+
       const hashedPassword = await bcrypt.hash(input.password, 10);
       const [newAdmin] = await db
         .insert(admins)
@@ -65,6 +74,13 @@ export const adminRouter = router({
 
       return { id: newAdmin.id, email: newAdmin.email };
     }),
+    // Check if an admin already exists
+    alreadyExists: publicProcedure
+    .input(z.object({ email: z.string().optional() }))
+    .query(async () => {
+      const [admin] = await db.select().from(admins).limit(1);
+      return !!admin;
+    }), 
 
   // logout
   logout: protectedProcedure.mutation(async () => {
@@ -93,14 +109,15 @@ export const adminRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      const updateData: any = { ...input };
+      const { id, ...data } = input;
+      const updateData: any = { ...data };
       if (input.password) {
         updateData.password = await bcrypt.hash(input.password, 10);
       }
       return await db
         .update(admins)
         .set(updateData)
-        .where(eq(admins.id, input.id))
+        .where(eq(admins.id, id))
         .returning();
     }),
 

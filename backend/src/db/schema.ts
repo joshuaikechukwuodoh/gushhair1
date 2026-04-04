@@ -3,7 +3,7 @@ import { pgTable, text, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
 // Admins
 export const admins = pgTable("admins", {
   id: uuid("id").defaultRandom().primaryKey(),
-  email: text("email").notNull(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
   role: text("role").default("admin"),
   createdAt: timestamp("created_at").defaultNow(),
