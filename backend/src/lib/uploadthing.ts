@@ -10,10 +10,12 @@ export const uploadRouter = {
     .middleware(async ({ req }) => {
       // You can check admin here later
 
-      const token = req.headers.get("Authorization");
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new Error("Unauthorized");
+      }
 
-      if (!token) throw new Error("Unauthorized");
-
+      const token = authHeader.substring(7);
       const decoded = await verifyJWT(token);
 
       if (!decoded) throw new Error("Unauthorized");
